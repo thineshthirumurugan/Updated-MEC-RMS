@@ -1,0 +1,54 @@
+GET http://localhost:1234/ecrFilter/getAcdYrList
+
+###
+
+GET http://localhost:1234/ecrFilter/getSemList
+
+###
+
+GET http://localhost:1234/ecrFilter/getDeptList
+
+###
+
+GET http://localhost:1234/ecrFilter/getFacultiesList/1
+
+###
+
+GET http://localhost:1234/ecrFilter/getMajorList
+
+###
+
+GET http://localhost:1234/ecrFilter/getSubList/2001
+
+###
+
+GET http://localhost:1234/ecrFilter/getHodFilter
+
+###
+
+GET http://localhost:1234/ecrFilter/filterReportsWithAcdYr/3
+
+###
+
+GET http://localhost:1234/ecrFilter/filterReportsWithAcdYrAndSem/3/1
+
+###
+
+GET http://localhost:1234/ecrFilter/filterReportsWithMajor/2001
+
+###
+
+GET http://localhost:1234/ecrFilter/filterReportsWithMajorAndSub/2001/3001
+
+###
+
+POST http://localhost:1234/ecrFilter/filterReportsWithParticulars
+Content-Type: application/json
+
+{
+    "acdyr_id":"3",
+    "sem_id":"1",
+    "major_id":"2001",
+    "sub_id":"data_management_seminar",
+    "emp_id":6004
+}

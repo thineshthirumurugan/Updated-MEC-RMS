@@ -1,0 +1,17 @@
+.overallcontent{
+    align-items: center;
+}
+.head{
+    display: flex;
+}
+/* .ej{
+    display: flex;
+} */
+.block{
+    display: flex;
+}
+label{
+    display: flex;
+    justify-content: first baseline;
+
+}
