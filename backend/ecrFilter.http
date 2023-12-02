@@ -42,7 +42,7 @@ GET http://localhost:1234/ecrFilter/filterReportsWithMajorAndSub/2001/3001
 
 ###
 
-POST http://localhost:1234/ecrFilter/filterReportsWithParticulars
+GET http://localhost:1234/cfilter/filterReportsWithParticulars/1001
 Content-Type: application/json
 
 {
@@ -50,5 +50,6 @@ Content-Type: application/json
     "sem_id":"1",
     "major_id":"2001",
     "sub_id":"data_management_seminar",
-    "emp_id":6004
+    "dept_id":"1",
+    "emp_id":"6004"
 }

@@ -594,176 +594,176 @@ route.get('/getHodFilter', async (req, res) => {
 //     }
 // });
 
-route.post("/filterReportsWithParticulars", async (req, res) => {
-    const { acdyr_id, sem_id, major_id, sub_id, emp_id } = req.body;
-    let sql = "SELECT * FROM data_sub_report_type WHERE head_report_id = 1001";
-console.log(acdyr_id+sem_id+major_id+sub_id+emp_id)
-    try {
-        const result = await new Promise((resolve, reject) => {
-            base.query(sql, (err, result) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(result);
-            });
-        });
+// route.post("/filterReportsWithParticulars", async (req, res) => {
+//     const { acdyr_id, sem_id, major_id, sub_id, emp_id } = req.body;
+//     let sql = "SELECT * FROM data_sub_report_type WHERE head_report_id = 1001";
+// console.log(acdyr_id+sem_id+major_id+sub_id+emp_id)
+//     try {
+//         const result = await new Promise((resolve, reject) => {
+//             base.query(sql, (err, result) => {
+//                 if (err) {
+//                     reject(err);
+//                     return;
+//                 }
+//                 resolve(result);
+//             });
+//         });
 
-        if (result.length === 0) {
-            res.status(201).json({ message: "No records found" });
-            return;
-        }
+//         if (result.length === 0) {
+//             res.status(201).json({ message: "No records found" });
+//             return;
+//         }
 
-        let resultArr = [];
+//         let resultArr = [];
 
-        for (let i = 0; i < result.length; i++) {
-            try {
-                let subSql;
-                let queryParams;
+//         for (let i = 0; i < result.length; i++) {
+//             try {
+//                 let subSql;
+//                 let queryParams;
 
-                // Adjusted conditions to use strict equality checks (!== and ===)
-                if (acdyr_id !== null && sem_id === null && major_id === null && sub_id === null) {
-                    subSql = `SELECT * FROM ${result[i].table_name} WHERE acdyr_id=? AND event_coordinator LIKE ?`;
-                    queryParams = [acdyr_id, `%${emp_id}%`];
-                    const rows = await new Promise((resolve, reject) => {
-                        base.query(subSql, queryParams, (err, rows) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(rows);
-                        });
-                    });
+//                 // Adjusted conditions to use strict equality checks (!== and ===)
+//                 if (acdyr_id !== null && sem_id === null && major_id === null && sub_id === null) {
+//                     subSql = `SELECT * FROM ${result[i].table_name} WHERE acdyr_id=? AND event_coordinator LIKE ?`;
+//                     queryParams = [acdyr_id, `%${emp_id}%`];
+//                     const rows = await new Promise((resolve, reject) => {
+//                         base.query(subSql, queryParams, (err, rows) => {
+//                             if (err) {
+//                                 reject(err);
+//                                 return;
+//                             }
+//                             resolve(rows);
+//                         });
+//                     });
     
-                    if (rows.length > 0) {
-                        resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                    }
-                } else if (acdyr_id !== null && sem_id !== null && major_id === null && sub_id === null) {
-                    subSql = `SELECT * FROM ${result[i].table_name} WHERE acdyr_id=? AND sem_id=? AND event_coordinator LIKE ?`;
-                    queryParams = [acdyr_id, sem_id, `%${emp_id}%`];
-                    const rows = await new Promise((resolve, reject) => {
-                        base.query(subSql, queryParams, (err, rows) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(rows);
-                        });
-                    });
+//                     if (rows.length > 0) {
+//                         resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                     }
+//                 } else if (acdyr_id !== null && sem_id !== null && major_id === null && sub_id === null) {
+//                     subSql = `SELECT * FROM ${result[i].table_name} WHERE acdyr_id=? AND sem_id=? AND event_coordinator LIKE ?`;
+//                     queryParams = [acdyr_id, sem_id, `%${emp_id}%`];
+//                     const rows = await new Promise((resolve, reject) => {
+//                         base.query(subSql, queryParams, (err, rows) => {
+//                             if (err) {
+//                                 reject(err);
+//                                 return;
+//                             }
+//                             resolve(rows);
+//                         });
+//                     });
     
-                    if (rows.length > 0) {
-                        resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                    }
-                } else if (acdyr_id === null && sem_id === null && major_id !== null && sub_id === null) {
-                    subSql = `SELECT * FROM ${result[i].table_name} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND event_coordinator LIKE ?`;
-                    queryParams = [major_id, `%${emp_id}%`];
-                    const rows = await new Promise((resolve, reject) => {
-                        base.query(subSql, queryParams, (err, rows) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(rows);
-                        });
-                    });
+//                     if (rows.length > 0) {
+//                         resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                     }
+//                 } else if (acdyr_id === null && sem_id === null && major_id !== null && sub_id === null) {
+//                     subSql = `SELECT * FROM ${result[i].table_name} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND event_coordinator LIKE ?`;
+//                     queryParams = [major_id, `%${emp_id}%`];
+//                     const rows = await new Promise((resolve, reject) => {
+//                         base.query(subSql, queryParams, (err, rows) => {
+//                             if (err) {
+//                                 reject(err);
+//                                 return;
+//                             }
+//                             resolve(rows);
+//                         });
+//                     });
     
-                    if (rows.length > 0) {
-                        resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                    }
-                } 
-                // else if (acdyr_id === null && sem_id === null && major_id !== null && sub_id !== null) {
-                //     subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
-                //     queryParams = [major_id, `%${emp_id}%`];
-                // } else if (acdyr_id !== null && sem_id !== null && major_id !== null && sub_id !== null) {
-                //     subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE ecr.acdyr_id=? AND ecr.sem_id=? AND major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
-                //     queryParams = [acdyr_id, sem_id, major_id, `%${emp_id}%`];
-                // }
+//                     if (rows.length > 0) {
+//                         resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                     }
+//                 } 
+//                 // else if (acdyr_id === null && sem_id === null && major_id !== null && sub_id !== null) {
+//                 //     subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
+//                 //     queryParams = [major_id, `%${emp_id}%`];
+//                 // } else if (acdyr_id !== null && sem_id !== null && major_id !== null && sub_id !== null) {
+//                 //     subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE ecr.acdyr_id=? AND ecr.sem_id=? AND major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
+//                 //     queryParams = [acdyr_id, sem_id, major_id, `%${emp_id}%`];
+//                 // }
 
-                // const rows = await new Promise((resolve, reject) => {
-                //     base.query(subSql, queryParams, (err, rows) => {
-                //         if (err) {
-                //             reject(err);
-                //             return;
-                //         }
-                //         resolve(rows);
-                //     });
-                // });
+//                 // const rows = await new Promise((resolve, reject) => {
+//                 //     base.query(subSql, queryParams, (err, rows) => {
+//                 //         if (err) {
+//                 //             reject(err);
+//                 //             return;
+//                 //         }
+//                 //         resolve(rows);
+//                 //     });
+//                 // });
 
-                // if (rows.length > 0) {
-                //     resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                // }
-            } catch (err) {
-                console.error({ err });
-            }
-        }
-        if (acdyr_id === null && sem_id === null && major_id !== null && sub_id !== null) {
-            subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
-            queryParams = [major_id, `%${emp_id}%`];
-            try{
-                const rows = await new Promise((resolve, reject) => {
-                    base.query(subSql, queryParams, (err, ress) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        resolve(ress);
-                        // console.log(ress)
-                    });
-                });
-                console.log(rows)
-                if (rows.length > 0) {
-                    resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                }
-                } catch (err){
-                    console.log({err})
-                }
-        } else if (acdyr_id !== null && sem_id !== null && major_id !== null && sub_id !== null) {
-            subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE ecr.acdyr_id=? AND ecr.sem_id=? AND major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
-            queryParams = [acdyr_id, sem_id, major_id, `%${emp_id}%`];
-            try{
-                const rows = await new Promise((resolve, reject) => {
-                    base.query(subSql, queryParams, (err, ress) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        resolve(ress);
-                        // console.log(ress)
-                    });
-                });
-                console.log(rows)
-                if (rows.length > 0) {
-                    resultArr = resultArr.concat(rows); // Use concat to merge arrays
-                }
-                } catch (err){
-                    console.log({err})
-                }
-        }
-        // try{
-        // const rows = await new Promise((resolve, reject) => {
-        //     base.query(subSql, queryParams, (err, ress) => {
-        //         if (err) {
-        //             reject(err);
-        //             return;
-        //         }
-        //         resolve(ress);
-        //         // console.log(ress)
-        //     });
-        // });
-        // console.log(rows)
-        // if (rows.length > 0) {
-        //     resultArr = resultArr.concat(rows); // Use concat to merge arrays
-        // }
-        // } catch (err){
-        //     console.log({err})
-        // }
+//                 // if (rows.length > 0) {
+//                 //     resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                 // }
+//             } catch (err) {
+//                 console.error({ err });
+//             }
+//         }
+//         if (acdyr_id === null && sem_id === null && major_id !== null && sub_id !== null) {
+//             subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
+//             queryParams = [major_id, `%${emp_id}%`];
+//             try{
+//                 const rows = await new Promise((resolve, reject) => {
+//                     base.query(subSql, queryParams, (err, ress) => {
+//                         if (err) {
+//                             reject(err);
+//                             return;
+//                         }
+//                         resolve(ress);
+//                         // console.log(ress)
+//                     });
+//                 });
+//                 console.log(rows)
+//                 if (rows.length > 0) {
+//                     resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                 }
+//                 } catch (err){
+//                     console.log({err})
+//                 }
+//         } else if (acdyr_id !== null && sem_id !== null && major_id !== null && sub_id !== null) {
+//             subSql = `SELECT * FROM ${sub_id} AS ecr INNER JOIN data_major_report_type AS major_type ON ecr.major_report_id = major_type.major_report_id WHERE ecr.acdyr_id=? AND ecr.sem_id=? AND major_type.major_report_id=? AND ecr.event_coordinator LIKE ?`;
+//             queryParams = [acdyr_id, sem_id, major_id, `%${emp_id}%`];
+//             try{
+//                 const rows = await new Promise((resolve, reject) => {
+//                     base.query(subSql, queryParams, (err, ress) => {
+//                         if (err) {
+//                             reject(err);
+//                             return;
+//                         }
+//                         resolve(ress);
+//                         // console.log(ress)
+//                     });
+//                 });
+//                 console.log(rows)
+//                 if (rows.length > 0) {
+//                     resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//                 }
+//                 } catch (err){
+//                     console.log({err})
+//                 }
+//         }
+//         // try{
+//         // const rows = await new Promise((resolve, reject) => {
+//         //     base.query(subSql, queryParams, (err, ress) => {
+//         //         if (err) {
+//         //             reject(err);
+//         //             return;
+//         //         }
+//         //         resolve(ress);
+//         //         // console.log(ress)
+//         //     });
+//         // });
+//         // console.log(rows)
+//         // if (rows.length > 0) {
+//         //     resultArr = resultArr.concat(rows); // Use concat to merge arrays
+//         // }
+//         // } catch (err){
+//         //     console.log({err})
+//         // }
 
-        // console.log(resultArr);
-        res.status(200).json(resultArr);
-    } catch (err) {
-        console.error({ err });
-        res.status(500).json({ err });
-    }
-});
+//         // console.log(resultArr);
+//         res.status(200).json(resultArr);
+//     } catch (err) {
+//         console.error({ err });
+//         res.status(500).json({ err });
+//     }
+// });
 
 module.exports=route
