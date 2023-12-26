@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
-import { approveLevel1, loadForLevel1 ,loadComForLevel1,approveComLevel1} from "./connect"
+import { approveLevel1, loadForLevel1 ,loadComForLevel1,approveComLevel1, Table, Major, SubReport} from "./connect"
 import './sty.css';
+import './facultyEcrFilter.css'
+import './hodEcrFilter.css'
 import { onTable } from "./connect";
 import axios from 'axios'
 import jsPDF from 'jspdf';
@@ -12,10 +14,51 @@ import Image4 from './logo4.jpg';
 export const ViewSeminar=()=>{
 
     useEffect(() =>{
-      
+        doSomething();
+        Maj()
+        Acad()
+        GetCurrAcd()
+        // Dept()
+        Faculty(loggedUser.dept_id  )
         sessionStorage.removeItem("report_id")
        },[])
     
+const logged=sessionStorage.getItem("person")
+const loggedUser = JSON.parse(logged)
+
+
+const GetCurrAcd=async()=>{
+    const t = await axios.get("http://localhost:1234/ecrFilter/getAcdYrList")
+    // alert(JSON.stringify(t.data.result))
+    const temp=t.data.result
+    let valueYr=0
+    temp.map(item=>{
+        // console.log(item.acd_status)
+        if(item.acd_status==1){
+            // console.log(item)
+            // setCurrAcd(item)
+            valueYr = JSON.stringify(item.acd_yr_id)
+            // alert(valueYr)
+            setFilter(old=>{
+                return{
+                    ...old,
+                    "acdyr_id":valueYr
+                }
+            })
+        }
+    })
+    // alert(JSON.stringify(valueYr))
+    // let newAcd = JSON.stringify(valueYr.acd_yr_id)
+    // let newAcdYr = parseInt(newAcd)
+    // alert(newAcdYr)
+    // setCurrAcd(newAcdYr)
+}
+
+const[allvalues,setAllvalues]=useState([]);
+const doSomething = async() =>{
+    const res=await Table()
+      setAllvalues(res.data)
+    }
     const [id, setId] = useState('');
 
    const viewPdf=async(report_id)=>{
@@ -25,7 +68,97 @@ export const ViewSeminar=()=>{
     handleDownload();
     
 }
+
+
+const[filter,setFilter]=useState({
+    "acdyr_id":null,
+    "sem_id":null,
+    "major_id":null,
+    "sub_id":null,
+    "dept_id":`${loggedUser.dept_id}`,
+    "emp_id":null
+    // "dept_id":null,
+    // "emp_id":null
+})
+console.log(filter)
+const onClickFilter=async()=>{
+    // alert("clicked")
+    // console.log(filter)
+    try{
+        const filteredRecords=await axios.post("http://localhost:1234/cfilter/filterReportsWithParticulars/1001",filter)
+        // alert(filteredRecords.data)
+        setAllvalues(filteredRecords.data)
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
+const[major,setMajor]=useState([])
+const Maj=async()=>{
+    const t = await Major()
+    setMajor(t)
+    // alert(t)
+}
+
+const[sub,setSub]=useState([])
+    const Sub=async(mid)=>{
+        const t = await SubReport(mid)
+        setSub(t)
+        // alert(t)
+    }
+
+// alert(JSON.stringify(currAcd))
+
+const[year,setYear]=useState([])
+   const Acad=async()=>{
+        const t = await axios.get("http://localhost:1234/ecrFilter/getAcdYrList")
+        // alert(JSON.stringify(t.data.result))
+        setYear(t.data.result)
+    }
+
+//     const[dept,setDept]=useState([])
+//    const Dept=async()=>{
+//         const t = await axios.get("http://localhost:1234/ecrFilter/getDeptList")
+//         // alert(JSON.stringify(t.data.result))
+//         setDept(t.data.result)
+//     }
+
+    const[faculty,setFaculty]=useState([])
+   const Faculty=async(did)=>{
+        const t = await axios.get(`http://localhost:1234/ecrFilter/getFacultiesList/${did}`)
+        // alert(JSON.stringify(t.data.result))
+        setFaculty(t.data.result)
+    }
    
+const infoCollect=(eve)=>{
+    const{name,value}=eve.target
+    if(name=="major_id"){
+        Sub(value)
+        setFilter((old)=>{
+            return{
+                ...old,
+                [name]:value
+            }
+        })
+    }
+    // if(name=="dept_id"){
+    //   Faculty(value)
+    //   setFilter((old)=>{
+    //       return{
+    //           ...old,
+    //           [name]:value
+    //       }
+    //   })
+    // }
+    else{
+        setFilter((old)=>{
+        return{
+            ...old,
+            [name]:value
+        }
+    })}
+}
 
   const handleDownload = async () => {
     try {
@@ -214,13 +347,11 @@ doc.text('Principal', 155, 290);
     // Open the PDF in a new tab or window
     const newWindow = window.open();
     newWindow.document.write(`<iframe width='100%' height='100%' src='${pdfDataUri}'></iframe>`);
-  
-  }
-      
-     catch (err) {
-      console.error(err);
+}
+    catch (err) {
+    console.error(err);
     }
-  }
+}
 
     const[ecrs,setEcrs]=useState([])
     const[ecrs1,setEcrs1]=useState([])
@@ -251,22 +382,19 @@ doc.text('Principal', 155, 290);
         const logged=JSON.parse(sessionStorage.getItem("person"))
         const temp = await loadForLevel1(logged.dept_id,logged.faculty_id)
         setEcrs(temp)
-       
     }
- 
 
     useEffect(()=>{
         loadSeminars()
-         load()
+        load()
     },[])
 
     const [id1, setId1] = useState('');
     const viewPdf1=async(report_id)=>{
-      const report=JSON.parse(sessionStorage.getItem("report_id"))
-      setId1(report.report_id)
+    const report=JSON.parse(sessionStorage.getItem("report_id"))
+    setId1(report.report_id)
       // alert("view Working")
-      handleDownload1();
-      
+    handleDownload1();
     }
     const ecr=async(report_id)=>{
         const temp=await onTable(report_id)
@@ -1429,6 +1557,79 @@ doc.text('Principal', 155, 290);
 <div className="main">
      
      
+<>
+        <div className="filter-dropdowns">
+
+            <div>
+            <label htmlFor="acdyr_id">Academic Year:</label>
+            <select name="acdyr_id" className="form group" onChange={infoCollect} value={filter.acdyr_id}>
+                        <option value="">Select Academic Year</option>
+                            {
+                                year.map((val,key)=>{
+                                    return (<option key={val.acd_yr_id} value={val.acd_yr_id}>{val.acd_yr}</option>)
+                                })
+                            }
+            </select></div>
+
+                            <div>
+            <label htmlFor="sem_id">Semester :</label>
+            <select name="sem_id" value={filter.sem} onChange={infoCollect}>
+                <option value="">Select Semester</option>
+                <option value="1">Odd Sem</option>
+                <option value="2">Even Sem</option>
+                <option value="3">Both</option>
+            </select><br /></div>
+
+                            <div>
+            <label for="major_id">Major Type :</label>
+            <select name="major_id" onChange={infoCollect} value={filter.major_id} >
+            <option value="">Select Major Type</option>
+            {
+                                major.map((val,key)=>{
+                                    return (<option key={val.major_report_id}  value={val.major_report_id}>{val.major_report}</option>)
+                                })
+                            }
+            </select></div>
+
+                            <div>
+            <label for="sub_id">Sub Type :</label>
+            <select name="sub_id" value={filter.sub_id} onChange={infoCollect}>
+            <option value="">Select Sub Type </option>
+            {
+                sub.map((val,key)=>{
+                    return (<option key={val.sub_report_id} value={`${val.table_name}`}>{val.sub_report}</option>)
+                })
+            }
+        </select></div>
+{/* 
+        <div>
+            <label for="dept_id">Department :</label>
+            <select name="dept_id" value={filter.dept_id} onChange={infoCollect}>
+            <option value="">Select Department </option>
+            {
+                dept.map((val,key)=>{
+                    return (<option key={val.dept_id} value={val.dept_id}>{val.dept}</option>)
+                })
+            }
+        </select></div> */}
+
+        <div>
+            <label for="emp_id">Faculty :</label>
+            <select name="emp_id" value={filter.emp_id} onChange={infoCollect}>
+            <option value="">Select Faculty </option>
+            {
+                faculty.map((val,key)=>{
+                    return (<option key={val.faculty_id} value={val.faculty_id}>{val.faculty_name}</option>)
+                })
+            }
+        </select></div>
+
+        <div>
+            <input className='filter-button' type='button' value="Filter" onClick={onClickFilter}/>
+        </div>
+
+            </div>
+    </> 
 
 
 

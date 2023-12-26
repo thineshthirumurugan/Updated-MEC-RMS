@@ -1,4 +1,3 @@
-
 import {Major, SubReport, Table,onTable} from './connect';
 import React, { useState, useEffect} from 'react';
 import "./sty.css"
@@ -9,10 +8,11 @@ import Image from './logo.png';
 import Image2 from './logo2.png';
 import Image3 from './logo3.jpg';
 import Image4 from './logo4.jpg';
-import FacultyEcrFilter from './FacultyEcrFilter';
+import './facultyEcrFilter.css';
+import Select from 'react-select';
 //import Img6001 from'./6001.jpeg';
 
-
+// localhost
 export const CreateEvent=()=>{
 // --------------------------------------------------
   useEffect(()=>{
@@ -21,7 +21,7 @@ export const CreateEvent=()=>{
     Maj()
     Acad()
     GetCurrAcd()
-    Dept()
+    // Dept()
     // alert(JSON.stringify(currAcd.acd_yr_id))
 },[])
 const[allvalues,setAllvalues]=useState([]);
@@ -42,10 +42,7 @@ const GetCurrAcd=async()=>{
     temp.map(item=>{
         // console.log(item.acd_status)
         if(item.acd_status==1){
-            // console.log(item)
-            // setCurrAcd(item)
             valueYr = JSON.stringify(item.acd_yr_id)
-            // alert(valueYr)
             setFilter(old=>{
                 return{
                     ...old,
@@ -54,35 +51,15 @@ const GetCurrAcd=async()=>{
             })
         }
     })
-    // alert(JSON.stringify(valueYr))
-    // let newAcd = JSON.stringify(valueYr.acd_yr_id)
-    // let newAcdYr = parseInt(newAcd)
-    // alert(newAcdYr)
-    // setCurrAcd(newAcdYr)
 }
+const[selectedAcd,setSelectedAcd]=useState([])
+const[selectedSem,setSelectedSem]=useState([])
+const[selectedMajor,setSelectedMajor]=useState([])
+const[selectedSub,setSelectedSub]=useState([])
 
 const logged=sessionStorage.getItem("person")
 const loggedUser = JSON.parse(logged)
 
-const[filter,setFilter]=useState({
-    "acdyr_id":null,
-    "sem_id":null,
-    "major_id":null,
-    "sub_id":null,
-    "dept_id":`${loggedUser.dept_id}`,
-    "emp_id":`${loggedUser.faculty_id}`
-    // "dept_id":null,
-    // "emp_id":null
-})
-console.log(filter)
-const onClickFilter=async()=>{
-  const temp=await axios.post("http://localhost:1234/ecrFilter/filterReportsWithParticulars",filter)
-//   console.log(temp.data)
-  setAllvalues(temp.data)
-
-}
-
-      
 const [currentPage, setCurrentPage] = useState(1);
       const recordsPerPage = 15;
     
@@ -101,6 +78,31 @@ const [currentPage, setCurrentPage] = useState(1);
         setCurrentPage((prevPage) => prevPage - 1);
       };
 
+const[filter,setFilter]=useState({
+    "acdyr_id":null,
+    "sem_id":null,
+    "major_id":null,
+    "sub_id":null,
+    "dept_id":`${loggedUser.dept_id}`,
+    "emp_id":`${loggedUser.faculty_id}`
+    // "dept_id":null,
+    // "emp_id":null
+})
+// console.log(filter)
+const onClickFilter=async()=>{
+    // alert("clicked")
+    // alert(JSON.stringify(filter))
+    try{
+        // alert("hi")
+        const filteredRecords=await axios.post("http://localhost:1234/cfilter/filterReportsWithParticulars/1001",filter)
+        // alert(filteredRecords.data)
+        setAllvalues(filteredRecords.data)
+    }
+    catch(err){
+        alert("No Reports in the selected filter")
+        console.log(err)
+    }
+}
 
 const[major,setMajor]=useState([])
 const Maj=async()=>{
@@ -108,6 +110,12 @@ const Maj=async()=>{
     setMajor(t)
     // alert(t)
 }
+const majors=major.map((val)=>({
+    value: val.major_report_id,
+    label: val.major_report,
+    extraInfo: "major_id"
+}))
+// console.log(majors)
 
 const[sub,setSub]=useState([])
     const Sub=async(mid)=>{
@@ -115,60 +123,78 @@ const[sub,setSub]=useState([])
         setSub(t)
         // alert(t)
     }
+    const subs=sub.map((val)=>({
+        value: val.sub_report_id,
+        label: val.sub_report,
+        extraInfo: "sub_id"
+    }))
+    // console.log(subs)
 
 // alert(JSON.stringify(currAcd))
 
-const[year,setYear]=useState([])
-   const Acad=async()=>{
+    const[year,setYear]=useState([])
+    const Acad=async()=>{
         const t = await axios.get("http://localhost:1234/ecrFilter/getAcdYrList")
         // alert(JSON.stringify(t.data.result))
         setYear(t.data.result)
     }
-
-    const[dept,setDept]=useState([])
-   const Dept=async()=>{
-        const t = await axios.get("http://localhost:1234/ecrFilter/getDeptList")
-        // alert(JSON.stringify(t.data.result))
-        setDept(t.data.result)
-    }
-
-    const[faculty,setFaculty]=useState([])
-   const Faculty=async(did)=>{
-        const t = await axios.get(`http://localhost:1234/ecrFilter/getFacultiesList/${did}`)
-        // alert(JSON.stringify(t.data.result))
-        setFaculty(t.data.result)
-    }
-
+    const years = year.map((val) => ({
+        value: val.acd_yr_id,
+        label: val.acd_yr,
+        extraInfo: "acdyr_id"
+        }));
+    // console.log(years)
+    
+    const semester = [
+        {sem_id:1,sem:"Odd"},
+        {sem_id:2,sem:"Even"},
+        {sem_id:3,sem:"Both"},
+    ]
+    const sems = semester.map((val)=>({
+        value: val.sem_id,
+        label: val.sem,
+        extraInfo: "sem_id"
+    }))
 
 const infoCollect=(eve)=>{
-    const{name,value}=eve.target
-    if(name=="major_id"){
-        Sub(value)
-        setFilter((old)=>{
-            return{
-                ...old,
-                [name]:value
-            }
-        })
-    }
-    if(name=="dept_id"){
-      Faculty(value)
-      setFilter((old)=>{
-          return{
-              ...old,
-              [name]:value
-          }
-      })
-    }
-    else{
-        setFilter((old)=>{
-        return{
+    // console.log(eve)
+    const label = eve.label
+    const value = eve.value
+    const extraInfo = eve.extraInfo
+    // alert(extraInfo)
+    if(extraInfo=="acdyr_id"){
+        setSelectedAcd(value)
+        // handleChange(value)
+        setFilter((old)=>({
             ...old,
-            [name]:value
-        }
-    })}
+            [extraInfo]:value
+        }))
+    }else if(extraInfo=="sem_id"){
+        setSelectedSem(value)
+        // handleChange(value)
+        setFilter((old)=>({
+            ...old,
+            [extraInfo]:value
+        }))
+    }else if(extraInfo=="major_id"){
+        Sub(value)
+        setSelectedMajor(value)
+        // handleChange(value)
+        setFilter((old)=>({
+            ...old,
+            [extraInfo]:value
+        }))
+    }else if(extraInfo=="sub_id"){
+        setSelectedSub(value)
+        // handleChange(value)
+        setFilter((old)=>({
+            ...old,
+            [extraInfo]:value
+        }))
+    }
 }
-// console.log(filter)
+
+console.log(filter)
 // ---------------------------------------------------
 
 
@@ -194,8 +220,6 @@ const viewPdf1=async(report_id)=>{
 
   const handleDownload = async () => {
     try {
-      
-      
       const res = await axios.get(`http://localhost:1234/seminar/data/${id}`);
       // console.log("hai");
       const data = res.data;
@@ -1589,69 +1613,63 @@ doc.text('Principal', 155, 290);
           <>
         <div className="filter-dropdowns">
 
-            <div>
-            <label htmlFor="acdyr_id">Academic Year:</label>
-            <select name="acdyr_id" className="form group" onChange={infoCollect} value={filter.acdyr_id}>
-                        <option value="">Select Academic Year</option>
-                            {
-                                year.map((val,key)=>{
-                                    return (<option key={val.acd_yr_id} value={val.acd_yr_id}>{val.acd_yr}</option>)
-                                })
-                            }
-            </select></div>
+<label for="acdyr_id">Academic Year : </label>
+<Select
+        className="form group"
+        // isMulti
+        name="acdyr_id"
+        options={years}
+        // value={selectedAcd}
+        onChange={infoCollect}
+        isSearchable
+        placeholder="Select options..."
+        closeMenuOnSelect={true}
+    />
+    {/* <input type="" name="acdyr_id" onChange={handleChange} value={selectedAcd} /> */}
 
-                            <div>
-            <label htmlFor="sem_id">Semester :</label>
-            <select name="sem_id" value={filter.sem} onChange={infoCollect}>
-                <option value="">Select Semester</option>
-                <option value="1">Odd Sem</option>
-                <option value="2">Even Sem</option>
-                <option value="3">Both</option>
-            </select><br /></div>
 
-                            <div>
-            <label for="major_id">Major Type :</label>
-            <select name="major_id" onChange={infoCollect} value={filter.major_id} >
-            <option value="">Select Major Type</option>
-            {
-                                major.map((val,key)=>{
-                                    return (<option key={val.major_report_id}  value={val.major_report_id}>{val.major_report}</option>)
-                                })
-                            }
-            </select></div>
+<label for="sem_id">Semester : </label>
+<Select
+        className="form group"
+        // isMulti
+        name="sem_id"
+        options={sems}
+        // value={selectedSem}
+        onChange={infoCollect}
+        isSearchable
+        placeholder="Select options..."
+        closeMenuOnSelect={true}
+        />
+            {/* <input type="" name="sem_id" onChange={handleChange} value={selectedSem} /> */}
 
-                            <div>
-            <label for="sub_id">Sub Type :</label>
-            <select name="sub_id" value={filter.sub_id} onChange={infoCollect}>
-            <option value="">Select Sub Type </option>
-            {
-                sub.map((val,key)=>{
-                    return (<option key={val.sub_report_id} value={`${val.table_name}`}>{val.sub_report}</option>)
-                })
-            }
-        </select></div>
-{/* 
-        <div>
-            <label for="dept_id">Department :</label>
-            <select name="dept_id" value={filter.dept_id} onChange={infoCollect}>
-            <option value="">Select Department </option>
-            {
-                dept.map((val,key)=>{
-                    return (<option key={val.dept_id} value={val.dept_id}>{val.dept}</option>)
-                })
-            }
-        </select></div>
 
-        <div>
-            <label for="emp_id">Faculty :</label>
-            <select name="emp_id" value={filter.emp_id} onChange={infoCollect}>
-            <option value="">Select Faculty </option>
-            {
-                faculty.map((val,key)=>{
-                    return (<option key={val.faculty_id} value={val.faculty_id}>{val.faculty_name}</option>)
-                })
-            }
-        </select></div> */}
+<label for="major_id">Major Type : </label>
+<Select
+className="form group"
+        // isMulti
+        name="major_id"
+        options={majors}
+        // value={selectedMajor}
+        onChange={infoCollect}
+        isSearchable
+        placeholder="Select options..."
+        closeMenuOnSelect={true}
+/>
+{/* <input type="" name="major_id" onChange={handleChange} value={selectedMajor} /> */}
+
+<label for="sub_id">Sub Type : </label>
+<Select
+className="form group"
+        // isMulti
+        name="sub_id"
+        options={subs}
+        // value={selectedSub}
+        onChange={infoCollect}
+        isSearchable
+        placeholder="Select options..."
+        closeMenuOnSelect={true}
+        />
+                    {/* <input type="" name="sub_id" onChange={handleChange} value={selectedSub} /> */}
 
         <div>
             <input className='filter-button' type='button' value="Filter" onClick={onClickFilter}/>
@@ -1659,14 +1677,6 @@ doc.text('Principal', 155, 290);
 
             </div>
     </>
-          {/* <button class="menu-button" data-category="Technical Symposium">Technical Symposium</button>
-          <button class="menu-button" data-category="Student Techtalk">Student Techtalk</button>
-          <button class="menu-button" data-category="Online Seminar">Online Seminar</button>
-          <button class="menu-button" data-category="Workshop">Workshop</button>
-          <button class="menu-button" data-category="MIST">MIST</button>
-          <button class="menu-button" data-category="NETS">NETS</button>
-          <button class="menu-button" data-category="GUEST Lectures">GUEST Lectures</button>
-          <button class="menu-button" data-category="AIM">AIM</button> */}
         </div>
 </div>
             <div class="report-container1">

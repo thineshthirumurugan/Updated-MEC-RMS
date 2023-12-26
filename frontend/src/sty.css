@@ -327,10 +327,10 @@ tr:nth-child(even) {
   box-shadow: 3px 3px 10px rgb(188, 188, 188);
   padding: 0px 20px 20px 20px;
 }
-/* .report-container h1{
-  background-color: #0a58ca;
-  color: white;
-} */
+.report-container h1{
+  font-weight: bolder;
+  color: #0a58ca;
+}
 .report-container1{
   min-height: 300px;
   min-width:100px;

@@ -1,4 +1,8 @@
 // import { Container, Nav, Navbar } from "react-bootstrap";
+
+
+// localhost
+
 import { useEffect, useState } from "react"
 import "./sty.css";
 import { onProposalsLoad, onPropose,Venue,Major,SubReport,Academic} from "./connect"
@@ -7,11 +11,7 @@ import { format } from 'date-fns';
 import Select from 'react-select';
 import axios from "axios";
 
-
-
 export const Add=()=>{
-
-
 
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [option, setOptions] = useState([]);
@@ -261,27 +261,26 @@ export const Add=()=>{
          
 
 
- <div className="report-container" style={{justifyContent:'center'}}>
-     <div class="report-header">
-         <h1 class="recent-Articles" style={{marginLeft:"200px",backgroundColor:"transparent"}}>EVENT PROPOSAL</h1>
-        
-     </div>
-     <div className="row justify-content-center"style={{justifyContent:'center'}}>
+<div className="report-container" style={{justifyContent:'center'}}>
+    <div class="report-header">
+        <h1 class="recent-Articles" style={{backgroundColor:"transparent"}}>EVENT PROPOSAL</h1>
+    </div>
+    <div className="row justify-content-center"style={{justifyContent:'center'}}>
 
-     {/* <label htmlFor="event-type">Select Event Type:</label>
-      <select id="event-type" onChange={handleChange} value={eventType}>
+    {/* <label htmlFor="event-type">Select Event Type:</label>
+    <select id="event-type" onChange={handleChange} value={eventType}>
         <option value="seminar">Seminar</option>
         <option value="workshop">Workshop</option>
       </select> */}
-       <Form>
-   
-     
+    <Form>
 
-     <div className="form group">
-     <label for="major_id">Major Type :</label>
-     <select name="major_id" value={seminar.major_id} onChange={infoCollect}>
-  <option value="">Select Major Type .......</option>
-  {
+
+
+    <div className="form group">
+    <label for="major_id">Major Type :</label>
+    <select name="major_id" value={seminar.major_id} onChange={infoCollect}>
+    <option value="">Select Major Type .......</option>
+    {
     // let t=0;
                                 major.map((val,key)=>{
                                     return (<option key={val.major_report_id}  value={val.major_report_id}>{val.major_report}</option>)
@@ -290,14 +289,11 @@ export const Add=()=>{
 </select>
 <label for="event_name">Sub Type :</label>
 <select name="event_name" value={seminar.event_name} onChange={infoCollect}>
-  <option value="">Select Event Nature .......</option>
-  { 
+    <option value="">Select Event Nature .......</option>
+    {
                                 sub.map((val,key)=>{
-                                    
                                     // temp=val.sub_report_id
-                                    
                                     return (<option key={val.sub_report_id} value={`${val.table_name}`}>{val.sub_report}</option>)
-                                    
                                 })
 
                                 // setSubId(temp)
